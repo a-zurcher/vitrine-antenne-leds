@@ -109,4 +109,5 @@ def start_server():
 
 
 if __name__ == '__main__':
+    reset_leds()
     threading.Thread(target=start_server).start()
