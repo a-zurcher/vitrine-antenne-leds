@@ -52,14 +52,13 @@ def default_animation():
         print("stopping default animation...")
         pwm_white.ChangeDutyCycle(0)
         pwm_white.stop()
-        GPIO.cleanup()
 
     print("playing default animation...")
 
     signal(SIGTERM, terminate)
 
     GPIO.setmode(GPIO.BCM)
-
+    GPIO.PWM(LED_RED, 0.1)
     pwm_white = GPIO.PWM(LED_WHITE, 100)
     pwm_white.start(0)
 
@@ -76,7 +75,6 @@ def blink_led_pwm(duration=3):
         print("stopping default animation...")
         pwm_red.ChangeDutyCycle(0)
         pwm_red.stop()
-        GPIO.cleanup()
 
         reset_animation()
 
@@ -85,6 +83,8 @@ def blink_led_pwm(duration=3):
     print("playing blink_led_pwm...")
 
     GPIO.setmode(GPIO.BCM)
+    GPIO.PWM(LED_WHITE, 0.1)
+
     pwm_red = GPIO.PWM(LED_RED, 100)
     pwm_red.start(0)
 
