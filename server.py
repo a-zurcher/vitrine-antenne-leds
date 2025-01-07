@@ -23,8 +23,10 @@ def reset_animation():
     """Function that continuously processes and prints messages from the queue"""
     global currently_running_animation_process
 
-    if currently_running_animation_process is not None and currently_running_animation_process.is_alive():
+    try:
         currently_running_animation_process.terminate()
+    except AttributeError as e:
+        pass
 
     currently_running_animation_process = Process(target=default_animation)
     currently_running_animation_process.start()
