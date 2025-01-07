@@ -83,9 +83,9 @@ def blink_led_pwm(duration=3):
 
     while time.time() - start_time < duration:
         pwm_red.ChangeDutyCycle(100)
-        time.sleep(0.5)
+        time.sleep(0.2)
         pwm_red.ChangeDutyCycle(0)
-        time.sleep(0.3)
+        time.sleep(0.2)
 
     print("stop blink_led_pwm...")
     pwm_red.ChangeDutyCycle(0)
