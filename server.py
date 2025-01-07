@@ -25,7 +25,7 @@ def reset_animation():
 
     try:
         currently_running_animation_process.terminate()
-    except AttributeError as e:
+    except AttributeError:
         pass
 
     currently_running_animation_process = Process(target=default_animation)
@@ -38,8 +38,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path == '/led':
             global currently_running_animation_process
             currently_running_animation_process.terminate()
-            currently_running_animation_process = Process(target=blink_led_pwm)
-            currently_running_animation_process.start()
+            blink_led_pwm()
 
             self.send_response(200)
             self.end_headers()
@@ -72,16 +71,6 @@ def default_animation():
 
 def blink_led_pwm(duration=3):
     """clignotement de la bande led"""
-
-    def terminate(*args):
-        print("stopping default animation...")
-        pwm_red.ChangeDutyCycle(0)
-        pwm_red.stop()
-
-        reset_animation()
-
-    signal(SIGTERM, terminate)
-    
     print("playing blink_led_pwm...")
 
     GPIO.setmode(GPIO.BCM)
