@@ -14,6 +14,8 @@ animation_queue = Queue()
 
 LED_WHITE = 12
 LED_RED = 18
+GPIO.setup(LED_WHITE, GPIO.OUT)
+GPIO.setup(LED_RED, GPIO.OUT)
 currently_running_animation_process: Process = Process()
 
 def reset_animation():
@@ -53,7 +55,7 @@ def default_animation():
     signal(SIGTERM, terminate)
 
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(LED_WHITE, GPIO.OUT)
+
     pwm_white = GPIO.PWM(LED_WHITE, 100)
     pwm_white.start(0)
 
@@ -79,7 +81,6 @@ def blink_led_pwm(duration=3):
     print("playing blink_led_pwm...")
 
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(LED_RED, GPIO.OUT)
     pwm_red = GPIO.PWM(LED_RED, 100)
     pwm_red.start(0)
 
