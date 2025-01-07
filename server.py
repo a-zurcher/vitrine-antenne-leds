@@ -1,4 +1,5 @@
 from multiprocessing import Process
+from signal import signal, SIGTERM
 
 import RPi.GPIO as GPIO
 import time
@@ -14,6 +15,10 @@ animation_queue = Queue()
 LED_WHITE = 12
 LED_RED = 18
 currently_running_animation_process: Process = Process()
+
+def reset_leds():
+    GPIO.output(LED_WHITE, GPIO.LOW)
+    GPIO.output(LED_RED, GPIO.LOW)
 
 def reset_animation():
     """Function that continuously processes and prints messages from the queue"""
@@ -39,62 +44,57 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
-def default_animation(duration=3):
+def default_animation():
     """simule tv effect avec bande led"""
-    
+    def terminate(*args):
+        print("stopping default animation...")
+        pwm_white.ChangeDutyCycle(0)
+        pwm_white.stop()
+
     print("playing default animation...")
 
+    signal(SIGTERM, terminate)
+
     GPIO.setmode(GPIO.BCM)
-
-    GPIO.setup(LED_RED, GPIO.OUT)
-    GPIO.PWM(LED_RED, 0.1)
-
     GPIO.setup(LED_WHITE, GPIO.OUT)
-
     pwm_white = GPIO.PWM(LED_WHITE, 100)
     pwm_white.start(0)
 
-    start_time = time.time()
-    try:
-        while True:
-            brightness = random.randint(50, 100)
-            pwm_white.ChangeDutyCycle(brightness)
-            time.sleep(random.uniform(0.2, 1.3))
-    finally:
-        print("stop default animation...")
-        pwm_white.ChangeDutyCycle(0)
-        pwm_white.stop()
-        GPIO.cleanup()
+    while True:
+        brightness = random.randint(50, 100)
+        pwm_white.ChangeDutyCycle(brightness)
+        time.sleep(random.uniform(0.2, 1.3))
 
 
 def blink_led_pwm(duration=3):
-    "clignotement de la bande led"
+    """clignotement de la bande led"""
+
+    def terminate(*args):
+        print("stopping default animation...")
+        pwm_red.ChangeDutyCycle(0)
+        pwm_red.stop()
+
+    signal(SIGTERM, terminate)
     
     print("playing blink_led_pwm...")
 
     GPIO.setmode(GPIO.BCM)
-
-    GPIO.setup(LED_WHITE, GPIO.OUT)
-    GPIO.PWM(LED_WHITE, 0.1)
-
     GPIO.setup(LED_RED, GPIO.OUT)
     pwm_red = GPIO.PWM(LED_RED, 100)
     pwm_red.start(0)
 
     start_time = time.time()
-    try:
-        while time.time() - start_time < duration:
-            pwm_red.ChangeDutyCycle(100)
-            time.sleep(0.5)
-            pwm_red.ChangeDutyCycle(0)
-            time.sleep(0.3)
 
-        reset_animation()
-    finally:
-        print("stop blink_led_pwm...")
+    while time.time() - start_time < duration:
+        pwm_red.ChangeDutyCycle(100)
+        time.sleep(0.5)
         pwm_red.ChangeDutyCycle(0)
-        pwm_red.stop()
-        GPIO.cleanup()
+        time.sleep(0.3)
+
+    print("stop blink_led_pwm...")
+    pwm_red.ChangeDutyCycle(0)
+    pwm_red.stop()
+    GPIO.cleanup()
 
 
 
@@ -110,4 +110,3 @@ def start_server():
 
 if __name__ == '__main__':
     threading.Thread(target=start_server).start()
-    message_processor()
