@@ -1,3 +1,5 @@
+from multiprocessing import Process
+
 import RPi.GPIO as GPIO
 import time
 import random
@@ -11,23 +13,25 @@ animation_queue = Queue()
 
 LED_WHITE = 12
 LED_RED = 18
+currently_running_animation_process: Process = Process()
 
-
-def message_processor():
+def reset_animation():
     """Function that continuously processes and prints messages from the queue"""
-    while True:
-        if not animation_queue.empty():
-            animation = animation_queue.get()
-            animation()
-        else:
-            default_animation()
-        # time.sleep(1)  # Simulate a delay between messages
+    global currently_running_animation_process
+
+    currently_running_animation_process = Process(target=default_animation)
+    currently_running_animation_process.start()
 
 class RequestHandler(BaseHTTPRequestHandler):
     """Custom request handler for the HTTP server"""
+
     def do_GET(self):
         if self.path == '/led':
-            animation_queue.put(blink_led_pwm)
+            global currently_running_animation_process
+            currently_running_animation_process.terminate()
+            currently_running_animation_process = Process(target=blink_led_pwm)
+            currently_running_animation_process.start()
+
             self.send_response(200)
             self.end_headers()
         else:
@@ -52,10 +56,10 @@ def default_animation(duration=3):
 
     start_time = time.time()
     try:
-        while time.time() - start_time < duration:
+        while True:
             brightness = random.randint(50, 100)
             pwm_white.ChangeDutyCycle(brightness)
-            time.sleep(random.uniform(0.8, 1.3))
+            time.sleep(random.uniform(0.2, 1.3))
     finally:
         print("stop default animation...")
         pwm_white.ChangeDutyCycle(0)
@@ -84,6 +88,8 @@ def blink_led_pwm(duration=3):
             time.sleep(0.5)
             pwm_red.ChangeDutyCycle(0)
             time.sleep(0.3)
+
+        reset_animation()
     finally:
         print("stop blink_led_pwm...")
         pwm_red.ChangeDutyCycle(0)
