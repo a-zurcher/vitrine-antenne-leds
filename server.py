@@ -16,10 +16,6 @@ LED_WHITE = 12
 LED_RED = 18
 currently_running_animation_process: Process = Process()
 
-def reset_leds():
-    GPIO.output(LED_WHITE, GPIO.LOW)
-    GPIO.output(LED_RED, GPIO.LOW)
-
 def reset_animation():
     """Function that continuously processes and prints messages from the queue"""
     global currently_running_animation_process
@@ -109,5 +105,5 @@ def start_server():
 
 
 if __name__ == '__main__':
-    reset_leds()
+    reset_animation()
     threading.Thread(target=start_server).start()
