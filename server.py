@@ -55,7 +55,7 @@ def default_animation(duration=3):
         while time.time() - start_time < duration:
             brightness = random.randint(50, 100)
             pwm_white.ChangeDutyCycle(brightness)
-            time.sleep(random.uniform(0.2, 1.3))
+            time.sleep(random.uniform(0.8, 1.3))
     finally:
         print("stop default animation...")
         pwm_white.ChangeDutyCycle(0)
