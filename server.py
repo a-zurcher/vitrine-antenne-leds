@@ -70,6 +70,8 @@ def blink_led_pwm(duration=3):
         pwm_red.ChangeDutyCycle(0)
         pwm_red.stop()
 
+        reset_animation()
+
     signal(SIGTERM, terminate)
     
     print("playing blink_led_pwm...")
@@ -90,7 +92,8 @@ def blink_led_pwm(duration=3):
     print("stop blink_led_pwm...")
     pwm_red.ChangeDutyCycle(0)
     pwm_red.stop()
-    GPIO.cleanup()
+
+    reset_animation()
 
 
 
