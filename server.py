@@ -14,6 +14,7 @@ animation_queue = Queue()
 
 LED_WHITE = 12
 LED_RED = 18
+GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_WHITE, GPIO.OUT)
 GPIO.setup(LED_RED, GPIO.OUT)
 currently_running_animation_process: Process = Process()
@@ -21,6 +22,9 @@ currently_running_animation_process: Process = Process()
 def reset_animation():
     """Function that continuously processes and prints messages from the queue"""
     global currently_running_animation_process
+
+    if currently_running_animation_process is not None and currently_running_animation_process.is_alive():
+        currently_running_animation_process.terminate()
 
     currently_running_animation_process = Process(target=default_animation)
     currently_running_animation_process.start()
