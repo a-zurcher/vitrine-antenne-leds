@@ -46,6 +46,7 @@ def default_animation():
         print("stopping default animation...")
         pwm_white.ChangeDutyCycle(0)
         pwm_white.stop()
+        GPIO.cleanup()
 
     print("playing default animation...")
 
@@ -69,6 +70,7 @@ def blink_led_pwm(duration=3):
         print("stopping default animation...")
         pwm_red.ChangeDutyCycle(0)
         pwm_red.stop()
+        GPIO.cleanup()
 
         reset_animation()
 
