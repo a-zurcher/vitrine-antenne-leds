@@ -35,7 +35,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     """Custom request handler for the HTTP server"""
 
     def do_GET(self):
-        if self.path == '/led':
+        if self.path == '/led-server/blink':
             global currently_running_animation_process
             currently_running_animation_process.terminate()
             blink_led_pwm()
